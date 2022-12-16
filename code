@@ -1,0 +1,435 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <conio.h>
+
+static int n=0;
+
+struct STUDENT
+
+{
+	int age, no, gymnastics, maths, chemistry, total;
+	char name[10];
+	float average;
+};
+
+int main()
+{
+
+	void add();
+	void pass();
+	void display();
+	void rec();
+	void del();
+	void sheet();
+	void modify();
+	void chPass();
+	int i, count=0, x, n=0, y, z, w;
+
+	printf("\n\t\t\tSTUDENT RECORD BOOK\n");
+
+		while(1)
+		{
+
+		printf("\nCHOOSE\n");
+		printf("\n1.Add a record");
+		printf("\n2.Delete a record");
+		printf("\n3.Modify a record");
+		printf("\n4.Generate mark sheet");
+		printf("\n5.Search for a record");
+		printf("\n6.Display all records");
+		printf("\n7.Exit\n");
+		scanf("%d",&x);
+		switch (x)
+		{
+			case 1:
+			{
+				pass();
+				add();
+				break;
+			}
+			case 2:
+			{
+				pass();
+				del();
+				break;
+			}
+			case 3:
+			{
+				pass();
+				modify();
+				break;
+			}
+			case 4:
+			{
+				sheet();
+				break;
+			}
+			case 5:
+			{
+				rec();
+				break;
+			}
+			case 6:
+			{
+				display();
+				break;
+			}
+			case 7:
+			{
+				exit(0);
+			}
+
+		}
+	}
+}
+
+void add()
+{
+		int i;
+		struct STUDENT s;
+		int size;
+
+		FILE *fp;
+		size = sizeof(s);
+
+		fp = fopen("StudentRecordBook","ab");
+ 		printf("\nEnter Number For Record\n");
+		scanf("%d",&s.no);
+
+		printf("Enter Name\n");
+		scanf("%s",s.name);
+
+		printf("Enter Age\n");
+		scanf("%d",&s.age);
+
+		printf("Enter Maths Grades\n");
+		scanf("%d",&s.maths);
+
+		printf("Enter Gymnastics Grades\n");
+		scanf("%d",&s.gymnastics);
+
+		printf("Enter Chemistry Grades\n");
+		scanf("%d",&s.chemistry);
+
+		s.total = s.maths+s.gymnastics+s.chemistry;
+		s.average = s.total/3;
+
+		fwrite(&s,size,1,fp);
+		fclose(fp);
+		printf("\nRecord Succesfully Added");
+}
+
+void pass()
+{
+	FILE *fp;
+	int i=0,count=0;
+
+	printf("\nEnter Password");
+
+	char ch[6], c[6], a, b;
+
+	fp = fopen("password.txt","r");
+
+	while((b = getc(fp)) != EOF)
+		{
+		c[i] = b;
+		i++;
+		}
+
+	for(i = 0; i < 6; i++)
+	{
+	a = getch();
+	ch[i] = a;
+	printf("*");
+
+	if(ch[i] == c[i])
+	{
+		count++;
+	}
+	}
+
+	if(count == 6)
+	{
+		printf("\nLogin Success");
+	}
+	else
+	{
+		printf("\nCredentials Invalid");
+		pass();
+	}
+	fclose(fp);
+}
+
+void display()
+{
+FILE *fp;
+struct STUDENT s;
+
+fp = fopen("StudentRecordBook","rb");
+
+printf("\t\t All Student Details\n\n");
+
+while(1)
+{
+fread(&s, sizeof(s), 1, fp);
+
+if(feof(fp))
+{
+break;
+}
+
+		printf("\nNo:%d\t",s.no);
+		printf("Name:%s\t",s.name);
+		printf("Age:%d\t",s.age);
+		printf("Total:%d\n",s.total);
+}
+
+fclose(fp);
+}
+
+void rec()
+{
+FILE *fp;
+struct STUDENT s;
+int id, found = 0;
+
+fp = fopen("StudentRecordBook","rb");
+printf("\nEnter the student no:");
+scanf("%d",&id);
+
+while(1)
+{
+fread(&s, sizeof(s), 1, fp);
+
+if(feof(fp))
+{
+break;
+}
+
+if(s.no == id)
+{
+found = 1;
+
+printf("\t\t Student Record of %d\n\n",s.no);
+
+		printf("No:%d\t",s.no);
+		printf("Name:%s\t",s.name);
+		printf("Age:%d\t",s.age);
+		printf("Total:%d\n",s.total);
+}
+}
+
+if(found == 0)
+{
+printf("\nNo Record Found");
+}
+
+fclose(fp);
+}
+
+void del()
+{
+FILE *fp,*fp1;
+struct STUDENT s,s1;
+int id,found=0;
+
+fp = fopen("StudentRecordBook","rb");
+fp1 = fopen("temp.dat","wb");
+
+printf("\nEnter Student No You Want To Delete:");
+scanf("%d", &id);
+
+while(1)
+{
+fread(&s, sizeof(s), 1, fp);
+
+if(feof(fp))
+{
+break;
+}
+if(s.no == id)
+{
+found = 1;
+}
+else
+{
+fwrite(&s, sizeof(s), 1, fp1);
+}
+}
+fclose(fp);
+fclose(fp1);
+
+if(found == 0)
+{
+printf("No Record Found\n\n");
+}
+else
+{
+fp = fopen("StudentRecordBook","wb");
+fp1 = fopen("temp.dat","rb");
+
+while(1)
+{
+fread(&s, sizeof(s), 1, fp1);
+
+if(feof(fp1))
+{
+break;
+}
+fwrite(&s, sizeof(s), 1, fp);
+}
+}
+fclose(fp);
+fclose(fp1);
+
+printf("Record Succesfully Deleted\n");
+}
+
+void sheet()
+{
+FILE *fp;
+struct STUDENT s;
+int id, found = 0;
+
+fp = fopen("StudentRecordBook","rb");
+printf("\nEnter Student's No:");
+scanf("%d", &id);
+while(1)
+{
+fread(&s, sizeof(s), 1, fp);
+if(feof(fp))
+{
+break;
+}
+if(s.no == id)
+{
+found = 1;
+
+printf("Student Marksheet of %d\n", s.no);
+
+		printf("No:%d\t", s.no);
+		printf("Name:%s\t",s.name);
+		printf("Maths:%d\t",s.maths);
+		printf("Gymnastics:%d\t",s.gymnastics);
+		printf("Chemistry:%d\t",s.chemistry);
+		printf("Total:%d\t",s.total);
+		printf("Average:%2f\n",s.average);
+
+}
+}
+
+if(found == 0)
+{
+printf("\nNo Record Found");
+}
+fclose(fp);
+}
+
+void modify()
+{
+FILE *fp,*fp1;
+struct STUDENT s;
+int id, found = 0;
+
+fp = fopen("StudentRecordBook","rb");
+fp1 = fopen("temp.dat","wb");
+
+printf("\nEnter Student's No You Want To Modify:");
+scanf("%d", &id);
+
+while(1)
+{
+fread(&s, sizeof(s), 1, fp);
+
+if(feof(fp))
+{
+break;
+}
+
+if(s.no == id)
+{
+
+found = 1;
+		printf("Enter No For Record\n");
+		scanf("%d",&s.no);
+		printf("Enter Name\n");
+		scanf("%s",s.name);
+		printf("Enter Age\n");
+		scanf("%d",&s.age);
+		printf("Enter Maths Grades\n");
+		scanf("%d",&s.maths);
+		printf("Enter Gymnastics Grades\n");
+		scanf("%d",&s.gymnastics);
+		printf("Enter Chemistry Grades\n");
+		scanf("%d",&s.chemistry);
+		s.total = s.maths + s.gymnastics + s.chemistry;
+		s.average = s.total/3;
+fwrite(&s, sizeof(s), 1, fp1);
+}
+
+else
+{
+fwrite(&s,sizeof(s),1,fp1);
+}
+}
+fclose(fp);
+fclose(fp1);
+
+if(found == 0)
+{
+printf("No Record Found\n\n");
+}
+
+else
+{
+fp = fopen("StudentRecordBook","wb");
+fp1 = fopen("temp.dat","rb");
+
+while(1)
+{
+fread(&s, sizeof(s), 1, fp1);
+
+if(feof(fp1))
+{
+break;
+}
+
+fwrite(&s, sizeof(s), 1, fp);
+}
+
+}
+fclose(fp);
+fclose(fp1);
+}
+
+void chPass()
+{
+	FILE *fp;
+	int i;
+	char ch[6], c[6], count = 0;
+
+	fp = fopen("password.txt","w");
+	printf("\nEnter New Password(6 Character): ");
+	scanf("%s", ch);
+	printf("\nRe-Enter Password: ");
+	scanf("%s", c);
+
+	for(i = 0; i < 6; i++)
+	{
+		if(ch[i] == c[i])
+		count++;
+	}
+	if(count == 6)
+	{
+	fprintf(fp, "%s", ch);
+	printf("\nPassword Successfully Changed");
+	}
+
+	else
+	{
+		printf("\nInvalid");
+		chPass();
+	}
+
+	fclose(fp);
+}
